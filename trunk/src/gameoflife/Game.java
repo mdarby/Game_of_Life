@@ -1,67 +1,99 @@
-/*
- * Game.java
- *
- * Created on October 27, 2006, 7:33 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
-
 package gameoflife;
 
+import java.applet.Applet;
+import java.awt.Button;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.util.Random;
-import java.util.Vector;
 
-
-public class Game {
-  private int cell_size = 1;
-  private int seed = 20;
-  private static int gen_count = 0;
-  private int columns = 500 / cell_size;
-  private int total_cells = columns * columns;  
-  private Cell board[][] = new Cell[columns][columns];  
+public class Game extends Applet{
+  private int seed = 15;
+  private int cellSize = 1;
+  private int columns = 100 / cellSize;
+  private int currGen[][] = new int[columns][columns];
+  private int nextGen[][] = new int[columns][columns];
+  
   
   public Game() {
     Random rand = new Random();
     
     for(int k=0; k<columns; k++){
       for(int i=0; i<columns; i++){
-        boolean life = rand.nextInt(seed) == 1 ? true : false;
-        board[k][i] = new Cell(life);
+	currGen[k][i] = rand.nextInt(seed) == 1 ? 1 : 0;
       }
     }
   }
-
-  public void updateStatus(){
-    int count = neighbors();
+  
+  private void life(){
+    for(int k=1; k<columns-1; k++){
+      for(int i=1; i<columns-1; i++){
+	int count = neighbors(k,i);
+	int status = currGen[k][i];
+	
+	if((status == 0 && count == 3) || (status == 1 && (count == 2 || count == 3))){
+	  nextGen[k][i] = 1;
+	} else{
+	  nextGen[k][i] = 0;
+	}
+      }
+    }
     
-    if((m_status == 0 && count == 3) || (m_status == 1 && (count == 2 || count == 3))){
-       return true;
-    }
-    else{
-      return false;
-    }
+    System.arraycopy(nextGen, 0, currGen, 0, Math.min(nextGen.length, currGen.length));
+    repaint();
   }
   
-  public int neighbors(){
-    int total = 0;
-    int i = 0;
+  public void paint(Graphics g) {
+    g.setColor(Color.WHITE);
     
-    total += i-columns-1 <= 0 ? 0 : p[i-columns-1];
-    total += i-columns <= 0 ? 0 : p[i-columns];
-    total += i-columns+1 <= 0 ? 0 : p[i-columns+1];
-    
-    total += i-1 <= 0 ? 0 : p[i-1];
-    total += i+1 >= total_cells ? 0 : p[i+1];
-    
-    total += i+columns-1 >= total_cells ? 0 : p[i+columns-1];
-    total += i+columns >= total_cells ? 0 : p[i+columns];
-    total += i+columns+1 >= total_cells ? 0 : p[i+columns+1];
-    
-    return total;
-  }  
+    for(int i=0; i<columns; i++){
+      for(int k=0; k<columns; k++){
+	if(currGen[i][k] == 1){
+	  g.fillRect(i*cellSize,k*cellSize,cellSize,cellSize);
+	} else{
+	  g.clearRect(i*cellSize,k*cellSize,cellSize,cellSize);
+	}
+      }
+    }
+    life();
+  }
   
-  public int getCount(){
-    return gen_count;
+  public void update(Graphics g) {
+    paint(g);
+  }
+  
+  public void init(){
+    setBackground(Color.black);
+    setSize(100,100);
+    Game g = new Game();
+    g.life();
+  }
+  
+  private void display(){
+    System.out.print("\n\n");
+    for(int i=0; i<columns; i++){
+      for(int k=0; k<columns; k++){
+	System.out.print(currGen[i][k] + " ");
+      }
+      System.out.print("\n");
+    }
+    System.out.print("\n\n");
+  }
+  
+  public int neighbors(int col, int row){
+    int total = 0;
+    
+    if(col < columns && row < columns){
+      total += currGen[col-1][row-1];
+      total += currGen[col][row-1];
+      total += currGen[col+1][row-1];
+      
+      total += currGen[col-1][row];
+      total += currGen[col+1][row];
+      
+      total += currGen[col-1][row+1];
+      total += currGen[col][row+1];
+      total += currGen[col+1][row+1];
+    }
+    return total;
   }
 }
