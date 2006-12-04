@@ -4,13 +4,15 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
-public class Window extends javax.swing.JFrame implements Game_Of_Life{
+public class Window extends javax.swing.JFrame implements Game_Of_Life, Runnable{
   
   private boolean gameRunning = false;
   private boolean forwardOneGen = false;
+  private volatile Thread t = new Thread();  
   
   public Window() {
     initComponents();
+    this.setVisible(true);
   }
   
   // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
@@ -110,11 +112,12 @@ public class Window extends javax.swing.JFrame implements Game_Of_Life{
     );
     pack();
   }// </editor-fold>//GEN-END:initComponents
-
+  
   private void stopButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_stopButtonMouseClicked
     gameRunning = false;
+    Thread.currentThread().interrupt();
   }//GEN-LAST:event_stopButtonMouseClicked
-
+  
   private void startButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_startButtonMouseClicked
     gameRunning = true;
     life();
@@ -135,16 +138,16 @@ public class Window extends javax.swing.JFrame implements Game_Of_Life{
   public int neighbors(int col, int row){
     int total = 0;
     
-    total += currGen[col-1][row-1];
-    total += currGen[col][row-1];
-    total += currGen[col+1][row-1];
+    total += (col-1 >= 0 && row-1 >= 0) ? currGen[col-1][row-1] : 0;
+    total += (col >= 0 && row-1 >= 0) ? currGen[col][row-1] : 0;
+    total += (col+1 < columns && row-1 >= 0) ? currGen[col+1][row-1] : 0;
     
-    total += currGen[col-1][row];
-    total += currGen[col+1][row];
+    total += (col-1 >= 0) ? currGen[col-1][row] : 0;
+    total += (col+1 < columns) ? currGen[col+1][row] : 0;
     
-    total += currGen[col-1][row+1];
-    total += currGen[col][row+1];
-    total += currGen[col+1][row+1];
+    total += (col-1 >= 0 && row+1 < columns) ? currGen[col-1][row+1] : 0;
+    total += (row+1 < columns) ? currGen[col][row+1] : 0;
+    total += (col+1 < columns && row+1 < columns) ? currGen[col+1][row+1] : 0;
     
     return total;
   }
@@ -166,25 +169,39 @@ public class Window extends javax.swing.JFrame implements Game_Of_Life{
   
   private void life(){
     while(gameRunning || forwardOneGen){
-      for(int k=1; k<columns-1; k++){
-	for(int i=1; i<columns-1; i++){
-	  int count = neighbors(k,i);
-	  int status = currGen[k][i];
-
+      for(int x = 0; x < columns; x++){
+	for(int y = 0; y < columns; y++){
+	  int count = neighbors(x,y);
+	  int status = currGen[x][y];
+	  
 	  if((status == 0 && count == 3) || (status == 1 && (count == 2 || count == 3))){
-	    nextGen[k][i] = 1;
+	    nextGen[x][y] = 1;
 	  } else {
-	    nextGen[k][i] = 0;
+	    nextGen[x][y] = 0;
 	  }
 	}
       }
-
-      System.arraycopy(nextGen, 0, currGen, 0, Math.min(nextGen.length, currGen.length));
-
+      
+      for(int x = 0; x < columns; x++){
+	for(int y = 0; y < columns; y++){
+	  currGen[x][y] = nextGen[x][y];
+	} 
+      }
+      
       updatePanel();
       
       if(forwardOneGen){
 	forwardOneGen = false;
+      }
+      
+      try {
+	if (Thread.interrupted()) {
+	  return;
+	} else{
+	  Thread.sleep(100);
+	}
+      } catch (InterruptedException ex) {
+	ex.printStackTrace();
       }
       
     }
@@ -193,12 +210,12 @@ public class Window extends javax.swing.JFrame implements Game_Of_Life{
   private static void updatePanel(){
     Graphics2D g2d = (Graphics2D) gamePanel.getGraphics();
     
-    for(int k = 0; k < columns; k++){
-      for(int i = 0; i < columns; i++){
-	if(currGen[k][i] == 1){
-	  updateCell(cellSize * k, cellSize * i, Color.RED, g2d);
+    for(int x = 0; x < columns; x++){
+      for(int y = 0; y < columns; y++){
+	if(currGen[x][y] == 1){
+	  updateCell(cellSize * x, cellSize * y, Color.RED, g2d);
 	} else {
-	  updateCell(cellSize * k, cellSize * i, Color.BLACK, g2d);
+	  updateCell(cellSize * x, cellSize * y, Color.BLACK, g2d);
 	}
       }
     }
@@ -237,15 +254,19 @@ public class Window extends javax.swing.JFrame implements Game_Of_Life{
       currGen[X][Y] = 0;
       g.setColor(Color.BLACK);
       g.fill(new Rectangle((X * cellSize)+1, (Y * cellSize)+1, cellSize-1, cellSize-1));
-    }
+    }    
   }//GEN-LAST:event_gamePanelMouseClicked
   
   public static void main(String args[]) {
-    java.awt.EventQueue.invokeLater(new Runnable() {
-      public void run() {
-	new Window().setVisible(true);
-      }
-    });
+//    java.awt.EventQueue.invokeLater(new Runnable() {
+//      public void run() {
+//	new Window().setVisible(true);
+//      }
+//    });
+    (new Thread(new Window())).start();
+  }
+  
+  public void run(){
   }
   
   // Variables declaration - do not modify//GEN-BEGIN:variables
