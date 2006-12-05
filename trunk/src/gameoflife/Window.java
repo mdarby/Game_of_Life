@@ -8,6 +8,7 @@ public class Window extends javax.swing.JFrame{
   
   private static int seed = 15;
   private static int cellSize = 5;
+  private static int genCount = 0;
   private static int columns = 500 / cellSize;
   private boolean gameRunning = false;
   private boolean forwardOneGen = false;
@@ -95,19 +96,19 @@ public class Window extends javax.swing.JFrame{
     slider.setMaximum(1000);
     slider.setMinorTickSpacing(10);
 
+    genLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+    genLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
     org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
     getContentPane().setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
       .add(layout.createSequentialGroup()
+        .addContainerGap()
         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+          .add(org.jdesktop.layout.GroupLayout.LEADING, gamePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+          .add(org.jdesktop.layout.GroupLayout.LEADING, slider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
           .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-            .addContainerGap()
-            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-              .add(gamePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-              .add(slider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)))
-          .add(layout.createSequentialGroup()
-            .add(46, 46, 46)
             .add(startButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 82, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
             .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
             .add(stopButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 55, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -117,8 +118,8 @@ public class Window extends javax.swing.JFrame{
             .add(clearButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 57, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
             .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
             .add(quitButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 53, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 30, Short.MAX_VALUE)
-            .add(genLabel)))
+            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+            .add(genLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 62, Short.MAX_VALUE)))
         .addContainerGap())
     );
 
@@ -127,25 +128,19 @@ public class Window extends javax.swing.JFrame{
     layout.setVerticalGroup(
       layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
       .add(layout.createSequentialGroup()
-        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-          .add(layout.createSequentialGroup()
-            .addContainerGap()
-            .add(gamePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-            .add(slider, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-          .add(layout.createSequentialGroup()
-            .add(564, 564, 564)
-            .add(genLabel)))
-        .addContainerGap(18, Short.MAX_VALUE))
-      .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-        .addContainerGap(548, Short.MAX_VALUE)
-        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-          .add(startButton)
-          .add(quitButton)
-          .add(clearButton)
-          .add(stepButton)
-          .add(stopButton))
-        .addContainerGap())
+        .addContainerGap()
+        .add(gamePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+        .add(slider, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+          .add(genLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .add(startButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .add(quitButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .add(stepButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .add(clearButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .add(stopButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
     pack();
   }// </editor-fold>//GEN-END:initComponents
@@ -244,6 +239,7 @@ public class Window extends javax.swing.JFrame{
         }
       }
       
+      genCount++;
       updatePanel();
       
       if(forwardOneGen){
@@ -276,6 +272,7 @@ public class Window extends javax.swing.JFrame{
       }
     }
     
+    genLabel.setText(String.valueOf(genCount));
     //paintGrid();
   }
   
@@ -325,7 +322,7 @@ public class Window extends javax.swing.JFrame{
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton clearButton;
   private static javax.swing.JPanel gamePanel;
-  private javax.swing.JLabel genLabel;
+  private static javax.swing.JLabel genLabel;
   private javax.swing.JButton quitButton;
   private javax.swing.JSlider slider;
   private javax.swing.JButton startButton;
