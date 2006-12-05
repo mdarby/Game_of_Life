@@ -4,11 +4,10 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
-public class Window extends javax.swing.JFrame implements Game_Of_Life, Runnable{
+public class Window extends javax.swing.JFrame implements Game_Of_Life{
   
   private boolean gameRunning = false;
   private boolean forwardOneGen = false;
-  private volatile Thread t = new Thread();  
   
   public Window() {
     initComponents();
@@ -17,11 +16,13 @@ public class Window extends javax.swing.JFrame implements Game_Of_Life, Runnable
   
   // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
   private void initComponents() {
-    gamePanel = new GamePanel();
+    gamePanel = new javax.swing.JPanel();
     stepButton = new javax.swing.JButton();
     clearButton = new javax.swing.JButton();
     startButton = new javax.swing.JButton();
     stopButton = new javax.swing.JButton();
+    quitButton = new javax.swing.JButton();
+    slider = new javax.swing.JSlider();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     gamePanel.setBackground(new java.awt.Color(0, 0, 0));
@@ -78,40 +79,73 @@ public class Window extends javax.swing.JFrame implements Game_Of_Life, Runnable
       }
     });
 
+    quitButton.setText("Quit");
+    quitButton.addMouseListener(new java.awt.event.MouseAdapter() {
+      public void mouseClicked(java.awt.event.MouseEvent evt) {
+        quitButtonMouseClicked(evt);
+      }
+    });
+
+    slider.setMajorTickSpacing(100);
+    slider.setMaximum(1000);
+    slider.setMinorTickSpacing(10);
+    slider.addChangeListener(new javax.swing.event.ChangeListener() {
+      public void stateChanged(javax.swing.event.ChangeEvent evt) {
+        sliderStateChanged(evt);
+      }
+    });
+
     org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
     getContentPane().setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
       .add(layout.createSequentialGroup()
         .addContainerGap()
-        .add(gamePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-        .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-      .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-        .addContainerGap(144, Short.MAX_VALUE)
-        .add(startButton)
-        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-        .add(stopButton)
-        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-        .add(stepButton)
-        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-        .add(clearButton)
-        .add(134, 134, 134))
+        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+          .add(layout.createSequentialGroup()
+            .add(gamePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+            .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+          .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+            .add(startButton)
+            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+            .add(stopButton)
+            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+            .add(stepButton)
+            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+            .add(clearButton)
+            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+            .add(quitButton)
+            .add(106, 106, 106))
+          .add(layout.createSequentialGroup()
+            .add(slider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
+            .addContainerGap())))
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
       .add(layout.createSequentialGroup()
         .addContainerGap()
         .add(gamePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+        .add(slider, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 11, Short.MAX_VALUE)
         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
           .add(startButton)
-          .add(stopButton)
           .add(stepButton)
-          .add(clearButton))
+          .add(clearButton)
+          .add(quitButton)
+          .add(stopButton))
         .addContainerGap())
     );
     pack();
   }// </editor-fold>//GEN-END:initComponents
+
+  private void sliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sliderStateChanged
+    System.out.println(String.valueOf(slider.getValue()));
+  }//GEN-LAST:event_sliderStateChanged
+
+  private void quitButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_quitButtonMouseClicked
+    System.exit(0);
+  }//GEN-LAST:event_quitButtonMouseClicked
   
   private void stopButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_stopButtonMouseClicked
     gameRunning = false;
@@ -120,7 +154,15 @@ public class Window extends javax.swing.JFrame implements Game_Of_Life, Runnable
   
   private void startButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_startButtonMouseClicked
     gameRunning = true;
-    life();
+    
+    Thread t = new Thread(new Runnable() {
+      public void run() {
+        life();
+      }
+    });
+    
+    t.start();
+    
   }//GEN-LAST:event_startButtonMouseClicked
   
   private void clearButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_clearButtonMouseClicked
@@ -128,7 +170,7 @@ public class Window extends javax.swing.JFrame implements Game_Of_Life, Runnable
     
     for(int k = 0; k < columns; k++){
       for(int i = 0; i < columns; i++){
-	currGen[k][i] = 0;
+        currGen[k][i] = 0;
       }
     }
     
@@ -154,7 +196,7 @@ public class Window extends javax.swing.JFrame implements Game_Of_Life, Runnable
   
   public static void updateCell(int X, int Y, Color c, Graphics2D g){
     g.setColor(c);
-    g.fill(new Rectangle(X, Y, cellSize, cellSize));
+    g.fill(new Rectangle(X + 1, Y + 1, cellSize-1, cellSize-1));
   }
   
   private static void paintGrid(){
@@ -170,38 +212,38 @@ public class Window extends javax.swing.JFrame implements Game_Of_Life, Runnable
   private void life(){
     while(gameRunning || forwardOneGen){
       for(int x = 0; x < columns; x++){
-	for(int y = 0; y < columns; y++){
-	  int count = neighbors(x,y);
-	  int status = currGen[x][y];
-	  
-	  if((status == 0 && count == 3) || (status == 1 && (count == 2 || count == 3))){
-	    nextGen[x][y] = 1;
-	  } else {
-	    nextGen[x][y] = 0;
-	  }
-	}
+        for(int y = 0; y < columns; y++){
+          int count = neighbors(x,y);
+          int status = currGen[x][y];
+          
+          if((status == 0 && count == 3) || (status == 1 && (count == 2 || count == 3))){
+            nextGen[x][y] = 1;
+          } else {
+            nextGen[x][y] = 0;
+          }
+        }
       }
       
       for(int x = 0; x < columns; x++){
-	for(int y = 0; y < columns; y++){
-	  currGen[x][y] = nextGen[x][y];
-	} 
+        for(int y = 0; y < columns; y++){
+          currGen[x][y] = nextGen[x][y];
+        }
       }
       
       updatePanel();
       
       if(forwardOneGen){
-	forwardOneGen = false;
+        forwardOneGen = false;
       }
       
       try {
-	if (Thread.interrupted()) {
-	  return;
-	} else{
-	  Thread.sleep(100);
-	}
+        if (Thread.interrupted()) {
+          return;
+        } else{
+          Thread.sleep(slider.getValue());
+        }
       } catch (InterruptedException ex) {
-	ex.printStackTrace();
+        ex.printStackTrace();
       }
       
     }
@@ -212,15 +254,15 @@ public class Window extends javax.swing.JFrame implements Game_Of_Life, Runnable
     
     for(int x = 0; x < columns; x++){
       for(int y = 0; y < columns; y++){
-	if(currGen[x][y] == 1){
-	  updateCell(cellSize * x, cellSize * y, Color.RED, g2d);
-	} else {
-	  updateCell(cellSize * x, cellSize * y, Color.BLACK, g2d);
-	}
+        if(currGen[x][y] == 1){
+          updateCell(cellSize * x, cellSize * y, Color.RED, g2d);
+        } else {
+          updateCell(cellSize * x, cellSize * y, Color.BLACK, g2d);
+        }
       }
     }
     
-    paintGrid();
+    //paintGrid();
   }
   
   private void stepButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_stepButtonMouseClicked
@@ -254,24 +296,22 @@ public class Window extends javax.swing.JFrame implements Game_Of_Life, Runnable
       currGen[X][Y] = 0;
       g.setColor(Color.BLACK);
       g.fill(new Rectangle((X * cellSize)+1, (Y * cellSize)+1, cellSize-1, cellSize-1));
-    }    
+    }
   }//GEN-LAST:event_gamePanelMouseClicked
   
   public static void main(String args[]) {
-//    java.awt.EventQueue.invokeLater(new Runnable() {
-//      public void run() {
-//	new Window().setVisible(true);
-//      }
-//    });
-    (new Thread(new Window())).start();
-  }
-  
-  public void run(){
+    java.awt.EventQueue.invokeLater(new Runnable() {
+      public void run() {
+	new Window().setVisible(true);
+      }
+    });
   }
   
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton clearButton;
   private static javax.swing.JPanel gamePanel;
+  private javax.swing.JButton quitButton;
+  private javax.swing.JSlider slider;
   private javax.swing.JButton startButton;
   private javax.swing.JButton stepButton;
   private javax.swing.JButton stopButton;
