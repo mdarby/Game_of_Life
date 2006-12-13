@@ -42,8 +42,6 @@ public class Window extends javax.swing.JFrame{
     genCount = 0;
     genLabel.setText("");
     
-    Graphics2D g2d = (Graphics2D) gamePanel.getGraphics();
-    
     for(int k = 0; k < matrixSize; k++){
       for(int i = 0; i < matrixSize; i++){
 	currGen[k][i] = 0;
@@ -98,7 +96,7 @@ public class Window extends javax.swing.JFrame{
     java.awt.EventQueue.invokeLater(new Runnable() {
       public void run() {
 	Window w = new Window();
-	
+	                   
 	g2d = (Graphics2D) gamePanel.getGraphics();
 	g2d.setComposite(makeComposite(.5F));
 	g2d.setBackground(DEAD);
@@ -131,7 +129,8 @@ public class Window extends javax.swing.JFrame{
     p.add(new Point(X, Y+1));
     p.add(new Point(X+1, Y+1));
     
-    for(int i=0; i < p.size(); i++){
+    
+    for(int i = 0; i < p.size(); i++){
       
       Point currPosition = (Point)p.elementAt(i);
       int cX = (int)currPosition.getX();
@@ -152,7 +151,7 @@ public class Window extends javax.swing.JFrame{
   private void quit(){
     stop();
     System.exit(0); 
-  }   
+  }
   
   private void start(){
     if(!gameRunning){
